@@ -1,0 +1,10 @@
+{
+  "name": "client",
+  "workspaces": [
+    "src/frontend"
+  ],
+  "scripts": {
+    "build": "NODE_ENV=production npm run build --workspace src/frontend",
+    "start": "npm run start --workspace src/frontend"
+  }
+}

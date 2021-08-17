@@ -1,0 +1,33 @@
+{
+  "name": "frontend",
+  "scripts": {
+    "gen:binding": "didc bind api.did --target js > generated/api.js",
+    "compile": "spago build",
+    "build": "spago bundle-app -t output/bundle.js && webpack",
+    "start": "webpack serve --mode development --env development",
+    "format": "purs-tidy format-in-place src",
+    "check-format": "purs-tidy check src"
+  },
+  "dependencies": {
+    "@dfinity/agent": "0.10.0-beta.1",
+    "@dfinity/candid": "0.10.0-beta.1",
+    "@dfinity/principal": "0.10.0-beta.1",
+    "events": "3.3.0",
+    "assert": "2.0.0",
+    "process": "0.11.10",
+    "util": "0.12.4",
+    "stream-browserify": "3.0.0",
+    "buffer": "^6.0.3"
+  },
+  "devDependencies": {
+    "copy-webpack-plugin": "^9.0.1",
+    "html-webpack-plugin": "5.3.2",
+    "purescript": "^0.14.3",
+    "purs-tidy": "^0.4.0",
+    "spago": "^0.20.3",
+    "terser-webpack-plugin": "5.1.4",
+    "webpack": "^5.50.0",
+    "webpack-cli": "4.7.2",
+    "webpack-dev-server": "^3.11.2"
+  }
+}

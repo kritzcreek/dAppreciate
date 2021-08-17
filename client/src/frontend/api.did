@@ -1,0 +1,7 @@
+type DAppr = record { name : text; canisterId : principal };
+type Today = record { balance : nat; dailyBudget : nat; dApprs : vec DAppr };
+type Client = service {
+  acceptDapr : (DAppr) -> () oneway;
+  today : () -> (Today) query;
+};
+service : (principal) -> Client

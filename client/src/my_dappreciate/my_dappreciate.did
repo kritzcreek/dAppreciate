@@ -1,0 +1,18 @@
+type anon_class_3_1 = 
+ service {
+   acceptDapr: (DAppr) -> () oneway;
+   greet: (text) -> (text);
+   today: () -> (Today) query;
+ };
+type Today = 
+ record {
+   balance: nat;
+   dApprs: vec DAppr;
+   dailyBudget: nat;
+ };
+type DAppr = 
+ record {
+   canisterId: principal;
+   name: text;
+ };
+service : (principal) -> anon_class_3_1
