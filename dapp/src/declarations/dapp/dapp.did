@@ -1,0 +1,4 @@
+service : {
+  accept_cycles: (opt principal) -> () oneway;
+  balance: () -> (nat);
+}
