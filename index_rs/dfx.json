@@ -1,0 +1,17 @@
+{
+  "canisters": {
+    "index_rs": {
+      "type": "custom",
+      "build": "src/index_rs/build.sh",
+      "candid": "src/index_rs/index_rs.did",
+      "wasm": "target/wasm32-unknown-unknown/release/index_rs.wasm"
+    }
+  },
+  "networks": {
+    "local": {
+      "bind": "127.0.0.1:8000",
+      "type": "ephemeral"
+    }
+  },
+  "version": 1
+}

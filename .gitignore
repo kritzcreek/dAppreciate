@@ -1,1 +1,7 @@
 .dfx
+
+# Various IDEs and Editors
+.vscode/
+.idea/
+**/*~
+index_rs/src/index_rs/Cargo.toml
