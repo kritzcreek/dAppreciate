@@ -1,0 +1,19 @@
+type Client = record {
+  "client_canister_id": principal;
+};
+
+type ApprovedClient = record {
+  "client_canister_id": principal;
+};
+
+type DonationReceiver = record {
+  "donation_receiver_canister_id": principal;
+}
+
+service : {
+  "print": () -> () query;
+  "register_client": (Client) -> ();
+  "approve_client": (ApprovedClient) -> ();
+  "current_client": () -> (opt Client) query;
+  "donate": (DonationReceiver) -> ();
+}
