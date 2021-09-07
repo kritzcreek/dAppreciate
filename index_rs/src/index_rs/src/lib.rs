@@ -1,4 +1,5 @@
 use ic_cdk::api::call::{CallResult, RejectionCode};
+use ic_cdk::caller;
 use ic_cdk::export::{
     candid::{CandidType, Deserialize},
     Principal,
@@ -6,7 +7,6 @@ use ic_cdk::export::{
 use ic_cdk_macros::*;
 use std::cell::RefCell;
 use std::collections::BTreeMap;
-use ic_cdk::caller;
 
 thread_local! {
     static STATE: State = State {
@@ -101,12 +101,7 @@ fn current_client() -> Option<Client> {
         donor: ic_cdk::caller(),
     };
 
-    STATE.with(|state| {
-        state.donor_to_client_map
-            .borrow()
-            .get(&donor)
-            .cloned()
-    })
+    STATE.with(|state| state.donor_to_client_map.borrow().get(&donor).cloned())
 }
 
 // Returns the `Client` that the self-authenticating principal issuing this call
@@ -116,12 +111,13 @@ fn current_client() -> Option<Client> {
 //
 // Traps if the caller is anonymous.
 fn trap_if_caller_not_authenticated() {
-    let blob = caller().as_slice();
+    let caller = ic_cdk::caller();
+    let blob = caller.as_slice();
     if blob.len() != 28 + 1 {
-        ic_cdk::trap(&format!("{} could not be authenticated.", caller()));
+        ic_cdk::trap(&format!("{} could not be authenticated.", caller));
     }
     if blob.last() != Some(&0x02) {
-        ic_cdk::trap(&format!("{} could not be authenticated.", caller()));
+        ic_cdk::trap(&format!("{} could not be authenticated.", caller));
     }
 }
 
