@@ -1,4 +1,4 @@
-use ic_cdk::api::call::{CallResult, RejectionCode};
+use ic_cdk::api::call::{CallResult};
 use ic_cdk::export::{
     candid::{CandidType, Deserialize},
     Principal,
@@ -69,7 +69,8 @@ fn print() {
 
 #[update]
 fn register_client(client: Client) -> u128 {
-    // TODO: trap if the principal is not self-authenticating
+    trap_if_caller_not_authenticated();
+
     let donor = Donor {
         donor: ic_cdk::caller(),
     };
@@ -89,10 +90,33 @@ fn approve_client(client: ApprovedClient) {
     ic_cdk::print(format!("Called approve_client for {:?}", client));
 }
 
+// Returns the `Client` that the self-authenticating principal issuing this call
+// is currently mapped to. Returns `None` if there is no mapping.
+//
+// Authentication: the call must be made using a self-authenticating principal
+//
+// Traps if the caller is anonymous.
 #[query]
 fn current_client() -> Option<Client> {
-    ic_cdk::print("Called current_client");
-    None
+    trap_if_caller_not_authenticated();
+
+    let donor = Donor {
+        donor: ic_cdk::caller(),
+    };
+
+    STATE.with(|state| state.donor_to_client_map.borrow().get(&donor).cloned())
+}
+
+
+fn trap_if_caller_not_authenticated() {
+    let caller = ic_cdk::caller();
+    let blob = caller.as_slice();
+    if blob.len() != 28 + 1 {
+        ic_cdk::trap(&format!("{} could not be authenticated.", caller));
+    }
+    if blob.last() != Some(&0x02) {
+        ic_cdk::trap(&format!("{} could not be authenticated.", caller));
+    }
 }
 
 // Issues an inter canister call to the `Client` that is registered for the
@@ -105,7 +129,7 @@ fn current_client() -> Option<Client> {
 #[update]
 async fn donate(receiver: DonationReceiver) {
     ic_cdk::print(format!("Called donate for {:?}", receiver));
-    trap_if_caller_anonymous();
+    trap_if_caller_not_authenticated();
     let donor_principal = Donor {
         donor: ic_cdk::caller(),
     };
@@ -115,13 +139,13 @@ async fn donate(receiver: DonationReceiver) {
             .get(&donor_principal)
             .cloned()
     });
-    if let Some(donor) = donor_client {
+    if let Some(client) = donor_client {
         let result: CallResult<()> =
-            ic_cdk::call(donor.client_canister_id, "donate", (receiver,)).await;
+            ic_cdk::call(client.client_canister_id, "donate", (receiver,)).await;
         match result {
             Err(e) => ic_cdk::trap(&format!(
                 "Call to client {:?} was not successful: {:?}",
-                donor.client_canister_id, e
+                client.client_canister_id, e
             )),
             Ok(_) => {}
         }
@@ -140,11 +164,4 @@ async fn donate(receiver: DonationReceiver) {
 #[query]
 fn __get_candid_interface_tmp_hack() -> String {
     include_str!("../index_rs.did").to_string()
-}
-
-// Traps if the caller is anonymous.
-fn trap_if_caller_anonymous() {
-    if ic_cdk::api::caller() == Principal::anonymous() {
-        ic_cdk::trap(&format!("Caller must not be anonymous."))
-    }
 }
