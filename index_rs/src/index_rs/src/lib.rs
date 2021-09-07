@@ -5,6 +5,7 @@ use ic_cdk::export::{
 use ic_cdk_macros::*;
 use std::cell::RefCell;
 use std::collections::BTreeMap;
+use ic_cdk::caller;
 
 thread_local! {
     static STATE: State = State {
@@ -74,8 +75,30 @@ fn approve_client(client: ApprovedClient) {
 #[query]
 fn current_client() -> Option<Client> {
     ic_cdk::print("Called current_client");
-    None
+    //TODO: Check caller is self-authenticated.
+    let donor = Donor {
+        donor: ic_cdk::caller(),
+    };
+    STATE.with(|state| {
+        if let Some(client ) = state.donor_to_client_map
+            .borrow()
+            .get(&donor) {
+            Some(client.clone())
+        } else { None }
+    })
 }
+//
+// // Checks if the caller is authenticated against any of the public keys provided
+// // and traps if not.
+// fn trap_if_not_authenticated<'a>(public_keys: impl Iterator<Item = &'a PublicKey>) {
+//     for pk in public_keys {
+//         if caller() == Principal::self_authenticating(pk) {
+//             return;
+//         }
+//     }
+//     ic_cdk::trap(&format!("{} could not be authenticated.", caller()))
+// }
+
 
 #[update]
 fn donate(receiver: DonationReceiver) {
