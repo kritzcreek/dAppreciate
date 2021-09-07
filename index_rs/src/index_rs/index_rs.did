@@ -12,7 +12,7 @@ type DonationReceiver = record {
 
 service : {
   "print": () -> () query;
-  "register_client": (Client) -> ();
+  "register_client": (Client) -> (nat);
   "approve_client": (ApprovedClient) -> ();
   "current_client": () -> (opt Client) query;
   "donate": (DonationReceiver) -> ();
