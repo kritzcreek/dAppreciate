@@ -1,3 +1,4 @@
+use ic_cdk::api::call::{CallResult, RejectionCode};
 use ic_cdk::export::{
     candid::{CandidType, Deserialize},
     Principal,
@@ -57,7 +58,8 @@ struct ApprovedClient {
 
 #[derive(Clone, Debug, CandidType, Deserialize)]
 struct DonationReceiver {
-    pub donation_receiver_canister_id: Principal,
+    pub receiver: Principal,
+    pub beneficiaries: Vec<Principal>,
 }
 
 #[query]
@@ -93,9 +95,40 @@ fn current_client() -> Option<Client> {
     None
 }
 
+// Issues an inter canister call to the `Client` that is registered for the
+// self-authenticating principal issuing this call. The mapping to the client
+// must be active.
+//
+// Authentication: the call must be made using a self-authenticating principal
+//
+// Traps if the caller is anonymous.
 #[update]
-fn donate(receiver: DonationReceiver) {
+async fn donate(receiver: DonationReceiver) {
     ic_cdk::print(format!("Called donate for {:?}", receiver));
+    trap_if_caller_anonymous();
+    let donor_principal = Donor {
+        donor: ic_cdk::caller(),
+    };
+    let donor_client = STATE.with(|s| {
+        s.donor_to_client_map
+            .borrow()
+            .get(&donor_principal)
+            .cloned()
+    });
+    if let Some(donor) = donor_client {
+        let result: CallResult<()> =
+            ic_cdk::call(donor.client_canister_id, "donate", (receiver,)).await;
+        match result {
+            Err(e) => ic_cdk::trap(&format!(
+                "Call to client {:?} was not successful: {:?}",
+                donor.client_canister_id, e
+            )),
+            Ok(_) => {}
+        }
+    } else {
+        // TODO: change this to an error so that we can handle this case in the UI
+        ic_cdk::trap(&format!("Found no mapping for this donor."))
+    }
 }
 
 /// This makes this Candid service self-describing, so that for example Candid UI, but also other
@@ -107,4 +140,11 @@ fn donate(receiver: DonationReceiver) {
 #[query]
 fn __get_candid_interface_tmp_hack() -> String {
     include_str!("../index_rs.did").to_string()
+}
+
+// Traps if the caller is anonymous.
+fn trap_if_caller_anonymous() {
+    if ic_cdk::api::caller() == Principal::anonymous() {
+        ic_cdk::trap(&format!("Caller must not be anonymous."))
+    }
 }

@@ -1,13 +1,14 @@
 type Client = record {
-  "client_canister_id": principal;
+  client_canister_id: principal;
 };
 
 type ApprovedClient = record {
-  "client_canister_id": principal;
+  client_canister_id: principal;
 };
 
 type DonationReceiver = record {
-  "donation_receiver_canister_id": principal;
+  receiver: principal;
+  beneficiaries: vec principal;
 }
 
 service : {
