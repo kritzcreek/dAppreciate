@@ -75,13 +75,11 @@ fn register_client(client: Client) -> u128 {
         "Registering client {:?} for donor {:?}",
         client, donor
     ));
-    let mut map_len = 0;
     STATE.with(|s| {
         let mut donor_to_client_map = s.donor_to_client_map.borrow_mut();
         donor_to_client_map.insert(donor, client);
-        map_len = donor_to_client_map.len();
-    });
-    map_len as u128
+        donor_to_client_map.len() as u128
+    })
 }
 
 #[update]
