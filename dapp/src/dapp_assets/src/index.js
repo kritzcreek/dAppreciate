@@ -1,9 +1,8 @@
 import { dapp } from "../../declarations/dapp";
 
 document.getElementById("clickMeBtn").addEventListener("click", async () => {
-  const name = document.getElementById("name").value.toString();
   // Interact with dapp actor, calling the greet method
-  const greeting = await dapp.greet(name);
+  const balance = await dapp.balance();
 
-  document.getElementById("greeting").innerText = greeting;
+  document.getElementById("balance").innerText = balance.toString();
 });
