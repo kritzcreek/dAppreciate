@@ -6,9 +6,11 @@
 // * adapt the canister IDs defined below to the ones that were deployed
 // * then run % ic-repl tests.sh
 
-import IndexCanister = "rrkah-fqaaa-aaaaa-aaaaq-cai";
+import IndexCanister = "q3fc5-haaaa-aaaaa-aaahq-cai";
+import ClientCanister = "qhbym-qaaaa-aaaaa-aaafq-cai";
 let client_canister_id = principal "qhbym-qaaaa-aaaaa-aaafq-cai";
-let donation_receiver = principal "fjm4k-j73tc-uhkc4-3hhrk-qi4hk-swun5-4xxzd-enw73-p4sm7-q2or5-nqe";
+let donation_receiver_0 = principal "fjm4k-j73tc-uhkc4-3hhrk-qi4hk-swun5-4xxzd-enw73-p4sm7-q2or5-nqe";
+let donation_receiver_1 = principal "ezyem-v2qbz-rlp6h-6pors-n7rq7-gnkzd-xbfes-vxwsu-22uig-4aeyo-pqe";
 
 identity Alice;
 
@@ -21,10 +23,23 @@ assert _ != (0 : nat);
 call IndexCanister.current_client();
 assert _ == opt record { client_canister_id = client_canister_id };
 
-// should successfully donate
+// should successfully make donation to donation_receiver_0
 call IndexCanister.donate(record
-          { receiver = donation_receiver;
+          { receiver = donation_receiver_0;
             beneficiaries = vec {}
           }
 );
 assert _ != (null : opt null);
+
+// should successfully make dontation to donation_receiver_1
+call IndexCanister.donate(record
+          { receiver = donation_receiver_1;
+            beneficiaries = vec {}
+          }
+);
+assert _ != (null : opt null);
+
+// should see the donations in the client canister
+let donations = call ClientCanister.list_donations();
+assert donations.pending[0].receiver.receiver == donation_receiver_0;
+assert donations.pending[1].receiver.receiver == donation_receiver_1;
