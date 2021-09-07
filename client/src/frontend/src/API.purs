@@ -1,4 +1,4 @@
-module API (DAppr, Today, Principal, Cycles(..), today) where
+module API where
 
 import Prelude
 
@@ -18,18 +18,25 @@ instance Show Cycles where
     let tc = BigInt.div c (BigInt.fromInt 1_000_000_000)
     toFixed 2 (BigInt.toNumber tc) <> "TC"
 
-type DAppr =
-  { canisterId :: Principal
-  , name :: String
+type DonationReceiver =
+  { receiver :: Principal
+  , beneficiaries :: Array Principal
   }
 
-type Today =
-  { dailyBudget :: Cycles
+type PendingDonation =
+  { receiver :: DonationReceiver
+  , count :: BigInt
+  }
+
+type DonationAmount = { amount :: Cycles }
+
+type PendingDonations =
+  { pending :: Array PendingDonation
+  , amount :: DonationAmount
   , balance :: Cycles
-  , dApprs :: Array DAppr
   }
 
-foreign import todayImpl :: EffectFnAff Today
+foreign import listDonationsImpl :: EffectFnAff PendingDonations
 
-today :: Aff Today
-today = fromEffectFnAff todayImpl
+listDonations :: Aff PendingDonations
+listDonations = fromEffectFnAff listDonationsImpl

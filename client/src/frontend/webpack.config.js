@@ -94,6 +94,6 @@ module.exports = {
         },
       },
     },
-    contentBase: path.resolve(__dirname)
+    static: path.resolve(__dirname)
   },
 };

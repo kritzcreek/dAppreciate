@@ -1,7 +1,75 @@
-type DAppr = record { name : text; canisterId : principal };
-type Today = record { balance : nat; dailyBudget : nat; dApprs : vec DAppr };
-type Client = service {
-  acceptDapr : (DAppr) -> () oneway;
-  today : () -> (Today) query;
+type DonationReceiver = record {
+  receiver: principal; 
+  beneficiaries : vec principal; // additional receivers of a donation.
 };
-service : (principal) -> Client
+
+type PendingDonations = record {
+  pending: vec PendingDonation; 
+  amount: DonationAmount;  // for the UI to display
+  balance: nat; // for the UI to display
+};
+
+type PendingDonation = record {
+  // the receiver of the donation
+  receiver: DonationReceiver;
+  // the number of button clicks for this receiver
+  count: nat; 
+};
+
+type DonationAmount = record {
+  // the amount of cycles to be distributed in the pending donations. 
+  amount: nat; 
+};
+
+service : {
+
+  // Registers the caller's self-authenticating principal as the unique user of 
+  // this client. Should be called only once to set up this client. 
+  // 
+  // Authentication: the call must be made using a self-authenticating principal
+  // 
+  // Traps if the caller is anonymous or if a user has already been registered. 
+  register : () -> (); 
+
+  // Add a donation to the `DonationReceiver` to the list of pending donations.  
+  //
+  // Authentication: The caller must be the index canister 
+  // or the hardcoded self-authenticating principal
+  // 
+  // Traps if the caller is not the index canister. 
+  donate : (DonationReceiver) -> ();
+
+  // Sets the total donation amount that will be distributed to PendingDonations
+  // upon `approve_donations`. 
+  // 
+  // If this method has never beencalled, the DonationAmount is set to the default of
+  // value of ???.??? cycles. 
+  // 
+  // Authentication: the call must be made using a the self-authenticating 
+  // principal that was used for `register`. 
+  // 
+  // Traps if the caller is not the registered one, also if it is anonymous. 
+  set_donation_amount : (DonationAmount) -> ();  
+
+  // Return the list of pending donations and the currently set `DonationAmount`. 
+  // 
+  // Authentication: the call must be made using a the self-authenticating 
+  // principal that was used for `register`. 
+  // 
+  // Traps if the caller is not the registered one, also if it is anonymous. 
+  list_donations : () -> (PendingDonations) query; 
+
+  // Pay out the pending donations. This will distribute the DonationAmount of 
+  // cycles set using `set_donation_amount` according to `PendingDonations`. 
+  // The amount of paid out cylces are weighted according to the counts in 
+  // `PendingDonation`. 
+  // 
+  // TODO: maybe return an error if the client canister does not have enough 
+  // cycles? 
+  // 
+  // Authentication: the call must be made using a the self-authenticating 
+  // principal that was used for `register`. 
+  // 
+  // Traps if the caller is not the registered one, also if it is anonymous. 
+  approve_donations : () -> (); 
+}
