@@ -80,14 +80,13 @@ fn current_client() -> Option<Client> {
         donor: ic_cdk::caller(),
     };
     STATE.with(|state| {
-        if let Some(client ) = state.donor_to_client_map
+        state.donor_to_client_map
             .borrow()
-            .get(&donor) {
-            Some(client.clone())
-        } else { None }
+            .get(&donor)
+            .cloned()
     })
 }
-//
+
 // // Checks if the caller is authenticated against any of the public keys provided
 // // and traps if not.
 // fn trap_if_not_authenticated<'a>(public_keys: impl Iterator<Item = &'a PublicKey>) {
