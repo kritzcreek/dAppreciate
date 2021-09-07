@@ -1,3 +1,4 @@
+use ic_cdk::api::call::{CallResult, RejectionCode};
 use ic_cdk::export::{
     candid::{CandidType, Deserialize},
     Principal,
@@ -102,16 +103,28 @@ fn current_client() -> Option<Client> {
 //
 // Traps if the caller is anonymous.
 #[update]
-fn donate(receiver: DonationReceiver) {
+async fn donate(receiver: DonationReceiver) {
     ic_cdk::print(format!("Called donate for {:?}", receiver));
     trap_if_caller_anonymous();
     let donor_principal = Donor {
         donor: ic_cdk::caller(),
     };
-    let donor_client = STATE.with(|s| s.donor_to_client_map.borrow().get(&donor_principal));
+    let donor_client = STATE.with(|s| {
+        s.donor_to_client_map
+            .borrow()
+            .get(&donor_principal)
+            .cloned()
+    });
     if let Some(donor) = donor_client {
-        let future = ic_cdk::call(donor.client_canister_id, "donate", (receiver,));
-        let r = ic_cdk::block_on(future);
+        let result: CallResult<()> =
+            ic_cdk::call(donor.client_canister_id, "donate", (receiver,)).await;
+        match result {
+            Err(e) => ic_cdk::trap(&format!(
+                "Call to client {:?} was not successful: {:?}",
+                donor.client_canister_id, e
+            )),
+            Ok(_) => {}
+        }
     } else {
         // TODO: change this to an error so that we can handle this case in the UI
         ic_cdk::trap(&format!("Found no mapping for this donor."))
