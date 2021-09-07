@@ -1,14 +1,24 @@
 export const idlFactory = ({ IDL }) => {
-  const DAppr = IDL.Record({ 'name' : IDL.Text, 'canisterId' : IDL.Principal });
-  const Today = IDL.Record({
+  const DonationReceiver = IDL.Record({
+    'beneficiaries' : IDL.Vec(IDL.Principal),
+    'receiver' : IDL.Principal,
+  });
+  const PendingDonation = IDL.Record({
+    'count' : IDL.Nat,
+    'receiver' : DonationReceiver,
+  });
+  const DonationAmount = IDL.Record({ 'amount' : IDL.Nat });
+  const PendingDonations = IDL.Record({
     'balance' : IDL.Nat,
-    'dailyBudget' : IDL.Nat,
-    'dApprs' : IDL.Vec(DAppr),
+    'pending' : IDL.Vec(PendingDonation),
+    'amount' : DonationAmount,
   });
-  const MyDAppr = IDL.Service({
-    'acceptDapr' : IDL.Func([DAppr], [], ['oneway']),
-    'today' : IDL.Func([], [Today], ['query']),
+  return IDL.Service({
+    'approve_donations' : IDL.Func([], [], []),
+    'donate' : IDL.Func([DonationReceiver], [], []),
+    'list_donations' : IDL.Func([], [PendingDonations], ['query']),
+    'register' : IDL.Func([], [], []),
+    'set_donation_amount' : IDL.Func([DonationAmount], [], []),
   });
-  return MyDAppr;
 };
-export const init = ({ IDL }) => { return [IDL.Principal]; };
+export const init = ({ IDL }) => { return []; };

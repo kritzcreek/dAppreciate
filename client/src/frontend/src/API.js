@@ -21,9 +21,11 @@ const client = dfnAgent.Actor.createActor(candid.idlFactory, {
 
 exports.toFixed = decimals => n => n.toFixed(decimals);
 
-exports.todayImpl = (onError, onSuccess) => {
-    client.today()
-        .then(onSuccess)
+exports.listDonationsImpl = (onError, onSuccess) => {
+    client.list_donations()
+        .then(res => {
+            console.log(res); onSuccess(res)
+        })
         .catch(onError);
 
     return (cancelError, onCancelerError, onCancelerSuccess) => onCancelerSuccess();
