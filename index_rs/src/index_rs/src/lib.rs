@@ -170,3 +170,4 @@ async fn donate(receiver: DonationReceiver) {
 #[query]
 fn __get_candid_interface_tmp_hack() -> String {
     include_str!("../index_rs.did").to_string()
+}
