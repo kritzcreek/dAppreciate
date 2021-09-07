@@ -17,7 +17,7 @@ call IndexCanister.register_client(record
           { client_canister_id = client_canister_id });
 assert _ != (0 : nat);
 
-// should successfully query
+// should successfully query the current client
 call IndexCanister.current_client();
 assert _ != (null : opt null);
 
