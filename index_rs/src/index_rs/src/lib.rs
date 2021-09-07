@@ -91,10 +91,14 @@ fn approve_client(client: ApprovedClient) {
     ic_cdk::print(format!("Called approve_client for {:?}", client));
 }
 
+// Returns the `Client` that the self-authenticating principal issuing this call
+// is currently mapped to. Returns `None` if there is no mapping.
+//
+// Authentication: the call must be made using a self-authenticating principal
+//
+// Traps if the caller is anonymous.
 #[query]
 fn current_client() -> Option<Client> {
-    ic_cdk::print("Called current_client");
-
     trap_if_caller_not_authenticated();
 
     let donor = Donor {
@@ -104,12 +108,7 @@ fn current_client() -> Option<Client> {
     STATE.with(|state| state.donor_to_client_map.borrow().get(&donor).cloned())
 }
 
-// Returns the `Client` that the self-authenticating principal issuing this call
-// is currently mapped to. Returns `None` if there is no mapping.
-//
-// Authentication: the call must be made using a self-authenticating principal
-//
-// Traps if the caller is anonymous.
+
 fn trap_if_caller_not_authenticated() {
     let caller = ic_cdk::caller();
     let blob = caller.as_slice();
