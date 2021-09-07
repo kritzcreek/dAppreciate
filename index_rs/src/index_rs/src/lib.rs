@@ -67,6 +67,7 @@ fn print() {
 
 #[update]
 fn register_client(client: Client) -> u128 {
+    // TODO: trap if the principal is not self-authenticating
     let donor = Donor {
         donor: ic_cdk::caller(),
     };
