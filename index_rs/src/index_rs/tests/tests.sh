@@ -6,7 +6,7 @@
 // * adapt the canister IDs defined below to the ones that were deployed
 // * then run % ic-repl tests.sh
 
-import IndexCanister = "q3fc5-haaaa-aaaaa-aaahq-cai";
+import IndexCanister = "rrkah-fqaaa-aaaaa-aaaaq-cai";
 let client_canister_id = principal "qhbym-qaaaa-aaaaa-aaafq-cai";
 let donation_receiver = principal "fjm4k-j73tc-uhkc4-3hhrk-qi4hk-swun5-4xxzd-enw73-p4sm7-q2or5-nqe";
 
@@ -16,6 +16,10 @@ identity Alice;
 call IndexCanister.register_client(record
           { client_canister_id = client_canister_id });
 assert _ != (0 : nat);
+
+// should successfully query
+call IndexCanister.current_client();
+assert _ != (null : opt null);
 
 // should successfully donate
 call IndexCanister.donate(record
