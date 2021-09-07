@@ -1,5 +1,4 @@
-use ic_cdk::api::call::{CallResult, RejectionCode};
-use ic_cdk::caller;
+use ic_cdk::api::call::{CallResult};
 use ic_cdk::export::{
     candid::{CandidType, Deserialize},
     Principal,
@@ -140,13 +139,13 @@ async fn donate(receiver: DonationReceiver) {
             .get(&donor_principal)
             .cloned()
     });
-    if let Some(donor) = donor_client {
+    if let Some(client) = donor_client {
         let result: CallResult<()> =
-            ic_cdk::call(donor.client_canister_id, "donate", (receiver,)).await;
+            ic_cdk::call(client.client_canister_id, "donate", (receiver,)).await;
         match result {
             Err(e) => ic_cdk::trap(&format!(
                 "Call to client {:?} was not successful: {:?}",
-                donor.client_canister_id, e
+                client.client_canister_id, e
             )),
             Ok(_) => {}
         }

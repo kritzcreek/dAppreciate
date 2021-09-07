@@ -19,7 +19,7 @@ assert _ != (0 : nat);
 
 // should successfully query the current client
 call IndexCanister.current_client();
-assert _ != (null : opt null);
+assert _ == opt record { client_canister_id = client_canister_id };
 
 // should successfully donate
 call IndexCanister.donate(record
