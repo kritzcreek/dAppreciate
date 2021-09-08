@@ -23,7 +23,7 @@ const LABEL_ASSETS: &[u8] = b"http_assets";
 
 thread_local! {
     static STATE: State = State {
-        daily_budget: RefCell::new(Cycles(100)),
+        daily_budget: RefCell::new(Cycles(1_000_000_000)),
         receivers: RefCell::new(vec![]),
         asset_hashes: RefCell::new(AssetHashes::default()),
     };
