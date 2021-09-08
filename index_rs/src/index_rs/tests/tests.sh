@@ -6,9 +6,9 @@
 // * adapt the canister IDs defined below to the ones that were deployed
 // * then run % ic-repl tests.sh
 
-import IndexCanister = "rdmx6-jaaaa-aaaaa-aaadq-cai";
-import ClientCanister = "r7inp-6aaaa-aaaaa-aaabq-cai";
-let client_canister_id = principal "r7inp-6aaaa-aaaaa-aaabq-cai";
+import IndexCanister = "t6rzw-2iaaa-aaaaa-aaama-cai";
+import ClientCanister = "txssk-maaaa-aaaaa-aaanq-cai";
+let client_canister_id = principal "txssk-maaaa-aaaaa-aaanq-cai";
 let donation_receiver_0 = principal "fjm4k-j73tc-uhkc4-3hhrk-qi4hk-swun5-4xxzd-enw73-p4sm7-q2or5-nqe";
 let donation_receiver_1 = principal "ezyem-v2qbz-rlp6h-6pors-n7rq7-gnkzd-xbfes-vxwsu-22uig-4aeyo-pqe";
 
@@ -41,5 +41,9 @@ assert _ != (null : opt null);
 
 // should see the donations in the client canister
 let donations = call ClientCanister.list_donations();
-assert donations.pending[0].receiver == donation_receiver_0;
-assert donations.pending[1].receiver == donation_receiver_1;
+assert donations.pending[0].receiver == donation_receiver_1;
+assert donations.pending[1].receiver == donation_receiver_0;
+
+// should see the donations in the client canister
+call ClientCanister.approve_donations();
+assert _ != (null : opt null);
