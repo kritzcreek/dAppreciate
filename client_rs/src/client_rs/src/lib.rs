@@ -170,6 +170,11 @@ async fn approve_donations() {
             Ok(_) => {}
         }
     }
+
+    // Now that the cycles have been sent, clear the receivers
+    STATE.with(|state| {
+        state.receivers.borrow_mut().clear();
+    });
 }
 
 fn balance() -> Cycles {

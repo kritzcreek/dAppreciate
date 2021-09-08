@@ -44,6 +44,10 @@ let donations = call ClientCanister.list_donations();
 assert donations.pending[0].receiver == donation_receiver_1;
 assert donations.pending[1].receiver == donation_receiver_0;
 
-// should see the donations in the client canister
+// should approve donations by sending the cycles
 call ClientCanister.approve_donations();
 assert _ != (null : opt null);
+
+// should have cleared the receivers after the cycles were sent
+let donations = call ClientCanister.list_donations();
+assert donations.pending == vec {}
