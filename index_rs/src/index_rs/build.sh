@@ -3,7 +3,7 @@ set -euo pipefail
 
 # Compile frontend assets to dist
 # echo SKIPPING: Compiling frontend assets
-npm run build
+npm run build --production
 
 INDEX_DIR="$(dirname "$0")"
 TARGET="wasm32-unknown-unknown"
