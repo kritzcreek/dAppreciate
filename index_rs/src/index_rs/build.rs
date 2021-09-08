@@ -6,8 +6,7 @@ use std::path::Path;
 
 #[derive(Debug)]
 pub enum ContentEncoding {
-    Identity,
-    GZip,
+    Identity
 }
 
 fn hash_file(path: &str) -> [u8; 32] {
@@ -21,16 +20,21 @@ fn main() -> Result<(), String> {
     let out_dir = env::var_os("OUT_DIR").unwrap();
     let assets_module_path = Path::new(&out_dir).join("assets.rs");
     let asset_rel_paths = [
-        ("/", "../frontend/index.html", ContentEncoding::Identity),
+        ("/", "../../dist/index.html", ContentEncoding::Identity),
         (
             "/index.html",
-            "../frontend/index.html",
+            "../../dist/index.html",
+            ContentEncoding::Identity,
+        ),
+        (
+            "/main.css",
+            "../../dist/main.css",
             ContentEncoding::Identity,
         ),
         (
             "/index.js",
-            "../frontend/index.js.gz",
-            ContentEncoding::GZip,
+            "../../dist/index.js",
+            ContentEncoding::Identity,
         ),
         /*
         (

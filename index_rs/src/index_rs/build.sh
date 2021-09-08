@@ -2,8 +2,8 @@
 set -euo pipefail
 
 # Compile frontend assets to dist
-echo SKIPPING: Compiling frontend assets
-# npm run build # TODO: enable this once the front-end details are clear
+# echo SKIPPING: Compiling frontend assets
+npm run build
 
 INDEX_DIR="$(dirname "$0")"
 TARGET="wasm32-unknown-unknown"

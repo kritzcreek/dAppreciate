@@ -34,8 +34,7 @@ initCanisterIds();
 const isDevelopment = process.env.NODE_ENV !== "production";
 const asset_entry = path.join(
   "src",
-  "index_rs_assets",
-  "src",
+  "frontend",
   "index.html"
 );
 
@@ -64,7 +63,7 @@ module.exports = {
   },
   output: {
     filename: "index.js",
-    path: path.join(__dirname, "dist", "index_rs_assets"),
+    path: path.join(__dirname, "dist"),
   },
 
   // Depending in the language or framework you are using for
@@ -86,8 +85,8 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         {
-          from: path.join(__dirname, "src", "index_rs_assets", "assets"),
-          to: path.join(__dirname, "dist", "index_rs_assets"),
+          from: path.join(__dirname, "src", "frontend", "assets"),
+          to: path.join(__dirname, "dist"),
         },
       ],
     }),
@@ -112,7 +111,6 @@ module.exports = {
       },
     },
     hot: true,
-    contentBase: path.resolve(__dirname, "./src/index_rs_assets"),
-    watchContentBase: true
+    static: path.resolve(__dirname, "./src/frontend")
   },
 };
