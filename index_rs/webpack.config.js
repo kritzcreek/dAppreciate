@@ -6,6 +6,9 @@ const CopyPlugin = require("copy-webpack-plugin");
 
 let localCanisters, prodCanisters, canisters;
 
+const LOCAL_II_CANISTER =
+    "http://rwlgt-iiaaa-aaaaa-aaaaa-cai.localhost:8000/#authorize";
+
 function initCanisterIds() {
   try {
     localCanisters = require(path.resolve(".dfx", "local", "canister_ids.json"));
@@ -92,7 +95,8 @@ module.exports = {
     }),
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'development',
-      INDEX_RS_CANISTER_ID: canisters["index_rs"]
+      INDEX_RS_CANISTER_ID: canisters["index_rs"],
+      LOCAL_II_CANISTER
     }),
     new webpack.ProvidePlugin({
       Buffer: [require.resolve("buffer/"), "Buffer"],

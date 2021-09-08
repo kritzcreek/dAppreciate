@@ -2,7 +2,12 @@
   "name": "index_rs_assets",
   "version": "0.1.0",
   "description": "Internet Computer starter application",
-  "keywords": ["Internet Computer", "Motoko", "JavaScript", "Canister"],
+  "keywords": [
+    "Internet Computer",
+    "Motoko",
+    "JavaScript",
+    "Canister"
+  ],
   "scripts": {
     "build": "webpack",
     "prebuild": "npm run copy:types",
@@ -23,14 +28,17 @@
     "stream-browserify": "3.0.0",
     "terser-webpack-plugin": "5.2.3",
     "util": "0.12.4",
+    "webpack": "5.52.0",
     "webpack-cli": "4.8.0",
-    "webpack-dev-server": "^4.1.1",
-    "webpack": "5.52.0"
+    "webpack-dev-server": "^4.1.1"
   },
   "browserslist": [
     "last 2 chrome version",
     "last 2 firefox version",
     "last 2 safari version",
     "last 2 edge version"
-  ]
+  ],
+  "dependencies": {
+    "@dfinity/auth-client": "^0.10.0"
+  }
 }

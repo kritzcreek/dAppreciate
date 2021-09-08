@@ -14,6 +14,20 @@
     <div id="notification"></div>
     <div id="loaderContainer"></div>
     <p>Welcome to the dAppreciate index canister!</p>
-    <!-- TODO: include js app: <script src="index.js" defer></script> -->
+    <section id="loginSection">
+      <p>Log in with Internet Identity:</p>
+      <button id="loginButton">Login</button>
+    </section>
+    <section class="hidden" id="registerSection">
+      <p>Register your dAppreciate Client canister by providing the canister ID:</p>
+      <input type="text" id="registerClientInput">
+      <button id="registerClientButton">Register dAppreciate Client</button>
+    </section>
+    <section class="hidden" id="approveSection">
+      <p>Approve your transaction:</p>
+      <p>Receiver: <span id="receiver"></span> </p>
+      <p>Beneficiaries:  <span id="beneficiaries"></span> </p>
+      <button id="approveButton">Approve this donation</button>
+    </section>
   </body>
 </html>
