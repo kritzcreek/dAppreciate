@@ -4,6 +4,7 @@
   , "console"
   , "debug"
   , "effect"
+  , "either"
   , "halogen"
   , "maybe"
   , "prelude"
