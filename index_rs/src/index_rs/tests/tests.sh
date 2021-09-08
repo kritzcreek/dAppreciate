@@ -9,8 +9,8 @@
 import IndexCanister = "q3fc5-haaaa-aaaaa-aaahq-cai";
 import ClientCanister = "qhbym-qaaaa-aaaaa-aaafq-cai";
 let client_canister_id = principal "qhbym-qaaaa-aaaaa-aaafq-cai";
-let donation_receiver_0 = principal "fjm4k-j73tc-uhkc4-3hhrk-qi4hk-swun5-4xxzd-enw73-p4sm7-q2or5-nqe";
-let donation_receiver_1 = principal "ezyem-v2qbz-rlp6h-6pors-n7rq7-gnkzd-xbfes-vxwsu-22uig-4aeyo-pqe";
+let donation_receiver_0 = service "fjm4k-j73tc-uhkc4-3hhrk-qi4hk-swun5-4xxzd-enw73-p4sm7-q2or5-nqe";
+let donation_receiver_1 = service "ezyem-v2qbz-rlp6h-6pors-n7rq7-gnkzd-xbfes-vxwsu-22uig-4aeyo-pqe";
 
 identity Alice;
 

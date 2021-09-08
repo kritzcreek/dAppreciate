@@ -7,9 +7,13 @@ type ApprovedClient = record {
 };
 
 type DonationReceiver = record {
-  receiver: principal;
-  beneficiaries: vec principal;
-}
+  receiver: Receiver;
+  beneficiaries: vec Receiver;
+};
+
+type Receiver = service {
+  accept_cycles: () -> ();
+};
 
 service : {
   "print": () -> () query;

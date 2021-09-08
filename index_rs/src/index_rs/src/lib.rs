@@ -15,6 +15,8 @@ use ic_cdk::trap;
 use serde::Serialize;
 use serde_bytes::{ByteBuf, Bytes};
 use ic_cdk::export::candid::Func;
+use ic_cdk::export::candid::parser::types::FuncMode;
+use ic_cdk::export::candid::types::{Type, Serializer, Function};
 
 mod assets;
 
@@ -102,8 +104,28 @@ struct ApprovedClient {
 
 #[derive(Clone, Debug, CandidType, Deserialize)]
 struct DonationReceiver {
+    pub receiver: Receiver,
+    pub beneficiaries: Vec<Receiver>,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+struct Receiver {
     pub receiver: Principal,
-    pub beneficiaries: Vec<Principal>,
+}
+
+// needed for motoko to be able to read the `DonationReceiver` type
+impl CandidType for Receiver {
+    fn _ty() -> Type {
+        Type::Service(vec![("accept_cycles".to_string(), Type::Func(Function{
+            modes: vec![],
+            args: vec![],
+            rets: vec![]
+        }))])
+    }
+
+    fn idl_serialize<S>(&self, serializer: S) -> Result<(), S::Error> where S: Serializer {
+        serializer.serialize_principal(self.receiver.as_slice())
+    }
 }
 
 #[query]
