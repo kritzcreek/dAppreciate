@@ -3,9 +3,12 @@ module Main where
 import Prelude
 
 import API as API
+import Data.Either (Either(..))
 import Data.Maybe (Maybe(..), maybe)
 import Effect (Effect)
-import Effect.Aff (Aff)
+import Effect.Aff (Aff, try)
+import Effect.Aff.Class (class MonadAff)
+import Effect.Console as Console
 import Halogen (liftAff)
 import Halogen as H
 import Halogen.Aff as HA
@@ -80,8 +83,15 @@ component =
     ]
 
   handleAction = case _ of
-    Initialize -> void $ H.fork do
-      pending <- liftAff API.listDonations
-      H.put { pending: Just pending }
+    Initialize ->
+      void (H.fork fetchDonations)
     ApproveDonations -> do
-      liftAff API.approveDonations
+      (liftAff (try API.approveDonations)) >>= case _ of
+        Left err -> H.liftEffect (Console.log ("Something went wrong during approval: " <> show err))
+        Right _ -> pure unit
+      fetchDonations
+
+fetchDonations :: forall a s o m. MonadAff m => H.HalogenM State a s o m Unit
+fetchDonations = do
+  pending <- liftAff API.listDonations
+  H.put { pending: Just pending }
