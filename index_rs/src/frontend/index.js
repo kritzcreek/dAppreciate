@@ -47,7 +47,7 @@ async function handleAuthenticated(authClient) {
     // ?receiver=rrkah-asdads-asdasd&beneficiaries=asdlasd-asdasd,asdlkjasd,adslads
     const searchParams = new URLSearchParams(window.location.search)
     const receiver = searchParams.get("receiver");
-    const beneficiaries = searchParams.get("beneficiaries")?.split(",");
+    const beneficiaries = searchParams.get("beneficiaries")?.split(",") ?? [];
     $("#receiver").innerText = receiver;
     $("#beneficiaries").innerText = beneficiaries?.join(", ");
 
