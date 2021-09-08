@@ -20,6 +20,7 @@ const client = dfnAgent.Actor.createActor(candid.idlFactory, {
 });
 
 exports.toFixed = decimals => n => n.toFixed(decimals);
+exports.trillion = 1_000_000_000_000n;
 
 exports.listDonationsImpl = (onError, onSuccess) => {
     client.list_donations()

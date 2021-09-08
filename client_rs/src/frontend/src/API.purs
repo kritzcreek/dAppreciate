@@ -12,10 +12,11 @@ type Principal = String
 newtype Cycles = Cycles BigInt
 
 foreign import toFixed :: Int -> Number -> String
+foreign import trillion :: BigInt
 
 instance Show Cycles where
   show (Cycles c) = do
-    let tc = BigInt.div c (BigInt.fromInt 1_000_000_000)
+    let tc = BigInt.div c trillion
     toFixed 2 (BigInt.toNumber tc) <> "TC"
 
 type DonationReceiver =
