@@ -20,7 +20,7 @@ async function run() {
             },
             identityProvider:
                 process.env.DFX_NETWORK === "local"
-                    ? process.env.LOCAL_II_CANISTER
+                    ? process.env.II_CANISTER_ID
                     : "https://identity.ic0.app/#authorize",
         });
     }

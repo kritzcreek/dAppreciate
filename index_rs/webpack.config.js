@@ -6,8 +6,8 @@ const CopyPlugin = require("copy-webpack-plugin");
 
 let localCanisters, prodCanisters, canisters;
 
-const LOCAL_II_CANISTER =
-    "http://rwlgt-iiaaa-aaaaa-aaaaa-cai.localhost:8000/#authorize";
+const II_CANISTER_ID =
+    `http://${process.env.II_CANISTER_ID}.localhost:8000/#authorize`;
 
 function initCanisterIds() {
   try {
@@ -97,7 +97,7 @@ module.exports = {
       NODE_ENV: 'development',
       DFX_NETWORK: 'ic',
       INDEX_RS_CANISTER_ID: canisters["index_rs"],
-      LOCAL_II_CANISTER
+      II_CANISTER_ID
     }),
     new webpack.ProvidePlugin({
       Buffer: [require.resolve("buffer/"), "Buffer"],

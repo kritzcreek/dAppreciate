@@ -8,27 +8,18 @@
 # - rustc stable?
 set -euxo pipefail
 
+export DFX_NETWORK=local
+
 pushd internet-identity
 npm ci
 II_ENV=development dfx deploy --no-wallet --argument '(null)'
-II_PRINCIPAL=$(dfx canister --no-wallet id internet_identity)
-popd
-
-pushd dapp
-npm ci
-dfx deploy
-popd
-
-pushd index
-npm ci
-dfx deploy
-INDEX_PRINCIPAL=$(dfx canister id index)
+II_CANISTER_ID=$(dfx canister --no-wallet id internet_identity)
 popd
 
 pushd index_rs
-# npm ci # enable this once the front-end details for index_rs are clear
+npm ci
 dfx deploy
-INDEX_RS_PRINCIPAL=$(dfx canister id index_rs)
+INDEX_CANISTER_ID=$(dfx canister id index_rs)
 popd
 
 pushd client_rs
@@ -36,6 +27,10 @@ npm ci
 pushd src/frontend
 npm ci
 popd
-DFX_NETWORK=local dfx deploy
+dfx deploy
 popd
 
+pushd dapp
+npm ci
+INDEX_CANISTER_URL=https://localhost:8000/?canisterId=$INDEX_CANISTER_ID dfx deploy
+popd
