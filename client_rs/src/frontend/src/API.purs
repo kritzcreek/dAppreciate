@@ -25,7 +25,7 @@ type DonationReceiver =
 
 type PendingDonation =
   { receiver :: Principal
-  , count :: BigInt
+  , count :: Int
   }
 
 type PendingDonations =
@@ -36,9 +36,13 @@ type PendingDonations =
 
 foreign import listDonationsImpl :: EffectFnAff PendingDonations
 foreign import approveDonationsImpl :: EffectFnAff Unit
+foreign import setDonationAmountImpl :: Cycles -> (EffectFnAff Unit)
 
 listDonations :: Aff PendingDonations
 listDonations = fromEffectFnAff listDonationsImpl
 
 approveDonations :: Aff Unit
 approveDonations = fromEffectFnAff approveDonationsImpl
+
+setDonationAmount :: Cycles -> Aff Unit
+setDonationAmount cy = fromEffectFnAff (setDonationAmountImpl cy)

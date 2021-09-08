@@ -64,7 +64,7 @@ renderFooter _ = HH.footer_
 renderDAppr :: forall act slots. API.PendingDonation -> HH.HTML act slots
 renderDAppr pending = HH.div
   [ HP.class_ (HH.ClassName "dAppr") ]
-  [ HH.text pending.receiver ]
+  [ HH.text (pending.receiver <> " (" <> show pending.count <> " click" <> if pending.count > 1 then "s)" else ")") ]
 
 component :: forall q i o. H.Component q i o Aff
 component =

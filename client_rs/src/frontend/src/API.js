@@ -40,3 +40,13 @@ exports.approveDonationsImpl = (onError, onSuccess) => {
 
     return (cancelError, onCancelerError, onCancelerSuccess) => onCancelerSuccess();
 };
+
+exports.setDonationAmountImpl = amount => (onError, onSuccess) => {
+    client.set_donation_amount(amount)
+        .then(_ => {
+            onSuccess()
+        })
+        .catch(onError);
+
+    return (cancelError, onCancelerError, onCancelerSuccess) => onCancelerSuccess();
+};
