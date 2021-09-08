@@ -1,8 +1,10 @@
 import Array "mo:base/Array";
 import Cycles "mo:base/ExperimentalCycles";
+import Debug "mo:base/Debug";
+import Hash "mo:base/Hash";
 import HashMap "mo:base/HashMap";
-import Principal "mo:base/Principal";
 import Iter "mo:base/Iter";
+import Principal "mo:base/Principal";
 
 actor {
 //actor class (indexCanister : Principal) {
@@ -13,8 +15,8 @@ actor {
     type Cycles = Nat;
 
     type DonationReceiver = {
-        receiver : Principal; 
-        beneficiaries : [Principal]; // additional receivers of a donation.
+        receiver : Donatee; 
+        beneficiaries : [Donatee]; // additional receivers of a donation.
     };
 
     type PendingDonations = {
@@ -35,6 +37,10 @@ actor {
         amount : Nat; 
     };
 
+    type Donatee = actor {
+        accept_cycles : () -> async ()
+    };
+
     public shared (msg) func donate(receiver : DonationReceiver) {
         // TODO Also allow owner
         // if(msg.caller != indexCanister) {
@@ -47,9 +53,11 @@ actor {
         dailyBudget := amount;
     };
 
-    public query (msg) func list_donations() : async PendingDonations {
+    func donateeEq(d1 : Donatee, d2 : Donatee) : Bool = Principal.equal(Principal.fromActor(d1), Principal.fromActor(d2));
+    func donateeHash(d : Donatee) : Hash.Hash = Principal.hash(Principal.fromActor(d));
 
-        let countMap : HashMap.HashMap<Principal, Nat> = HashMap.HashMap(16, Principal.equal, Principal.hash);
+    func pending_donations() : PendingDonations {
+        let countMap : HashMap.HashMap<Donatee, Nat> = HashMap.HashMap(16, donateeEq, donateeHash);
 
         for ({ receiver } in receivers.vals()) {
             switch (countMap.get(receiver)) {
@@ -62,7 +70,7 @@ actor {
             };
         };
 
-        let pending: [PendingDonation] = Array.map(Iter.toArray(countMap.entries()), func ((principal : Principal, count : Nat)) : PendingDonation {
+        let pending: [PendingDonation] = Array.map(Iter.toArray(countMap.entries()), func ((principal : Donatee, count : Nat)) : PendingDonation {
             { receiver = { receiver = principal; beneficiaries = [] }; count }
         });
 
@@ -72,6 +80,22 @@ actor {
             pending;
         }
     };
+
+    public query (msg) func list_donations() : async PendingDonations {
+        pending_donations()
+    };
+
+    // TODO: Properly weigh the different receivers
+    public shared func approve_donations() : async () {
+        for (donatee in pending_donations().pending.vals()) {
+            Cycles.add(1_000_000_000_000);
+            try { 
+                await donatee.receiver.receiver.accept_cycles() 
+            } catch (_) {
+                Debug.print("Failed to send cycles to: " # Principal.toText(Principal.fromActor(donatee.receiver.receiver)));
+            };
+        };
+    }
 };
 
 
