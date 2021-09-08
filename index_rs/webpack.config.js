@@ -95,6 +95,7 @@ module.exports = {
     }),
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'development',
+      DFX_NETWORK: 'ic',
       INDEX_RS_CANISTER_ID: canisters["index_rs"],
       LOCAL_II_CANISTER
     }),

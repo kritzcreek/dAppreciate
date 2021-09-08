@@ -19,7 +19,7 @@ async function run() {
                 handleAuthenticated(authClient);
             },
             identityProvider:
-                process.env.NODE_ENV === "development"
+                process.env.DFX_NETWORK === "local"
                     ? process.env.LOCAL_II_CANISTER
                     : "https://identity.ic0.app/#authorize",
         });
