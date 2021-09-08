@@ -29,7 +29,7 @@ renderHeader { pending } = HH.header_
   [ HH.text "dApprecation Client"
   , HH.section
       [ HP.id "budget" ]
-      [ budget "Daily Budget" (maybe "Loading" (show <<< _.amount.amount) pending)
+      [ budget "Daily Budget" (maybe "Loading" (show <<< _.amount) pending)
       , budget "Balance" (maybe "Loading" (show <<< _.balance) pending)
       ]
   ]
@@ -63,7 +63,7 @@ renderFooter _ = HH.footer_
 renderDAppr :: forall act slots. API.PendingDonation -> HH.HTML act slots
 renderDAppr pending = HH.div
   [ HP.class_ (HH.ClassName "dAppr") ]
-  [ HH.text pending.receiver.receiver ]
+  [ HH.text pending.receiver ]
 
 component :: forall q i o. H.Component q i o Aff
 component =

@@ -31,11 +31,11 @@ dfx deploy
 INDEX_RS_PRINCIPAL=$(dfx canister id index_rs)
 popd
 
-pushd client
+pushd client_rs
 npm ci
 pushd src/frontend
 npm ci
 popd
-dfx deploy --argument "(principal \"$INDEX_PRINCIPAL\")"
+DFX_NETWORK=local dfx deploy
 popd
 

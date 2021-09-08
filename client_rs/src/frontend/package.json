@@ -1,7 +1,7 @@
 {
   "name": "frontend",
   "scripts": {
-    "gen:binding": "didc bind api.did --target js > generated/api.js",
+    "gen:binding": "didc bind ../client_rs/client_rs.did --target js > generated/api.js",
     "compile": "spago build",
     "build": "spago bundle-app -t output/bundle.js && webpack",
     "start": "webpack serve --mode development --env development",

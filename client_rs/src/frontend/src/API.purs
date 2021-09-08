@@ -24,15 +24,13 @@ type DonationReceiver =
   }
 
 type PendingDonation =
-  { receiver :: DonationReceiver
+  { receiver :: Principal
   , count :: BigInt
   }
 
-type DonationAmount = { amount :: Cycles }
-
 type PendingDonations =
   { pending :: Array PendingDonation
-  , amount :: DonationAmount
+  , amount :: Cycles
   , balance :: Cycles
   }
 
