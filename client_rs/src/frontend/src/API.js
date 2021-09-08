@@ -1,7 +1,7 @@
 var candid = require("generated/api.js");
 var dfnAgent = require("@dfinity/agent");
 
-const canisterId = process.env.CLIENT_CANISTER_ID;
+const canisterId = process.env.CLIENT_RS_CANISTER_ID;
 
 const agent = new dfnAgent.HttpAgent();
 

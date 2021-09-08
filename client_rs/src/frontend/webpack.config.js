@@ -8,12 +8,12 @@ let localCanisters, prodCanisters, canisters;
 
 function initCanisterIds() {
   try {
-    localCanisters = require(path.resolve("../../", ".dfx", "local", "canister_ids.json"));
+    localCanisters = require(path.resolve(__dirname, "../../", ".dfx", "local", "canister_ids.json"));
   } catch (error) {
     console.log("No local canister_ids.json found. Continuing production");
   }
   try {
-    prodCanisters = require(path.resolve("../../", "canister_ids.json"));
+    prodCanisters = require(path.resolve(__dirname, "../../", "canister_ids.json"));
   } catch (error) {
     console.log("No production canister_ids.json found. Continuing with local");
   }
@@ -25,8 +25,7 @@ function initCanisterIds() {
   canisters = network === "local" ? localCanisters : prodCanisters;
 
   for (const canister in canisters) {
-    process.env[canister.toUpperCase() + "_CANISTER_ID"] =
-      canisters[canister][network];
+    process.env[canister.toUpperCase() + "_CANISTER_ID"] = canisters[canister][network];
   }
 }
 initCanisterIds();
@@ -59,7 +58,7 @@ module.exports = {
   },
   output: {
     filename: "index.js",
-    path: path.join(distDir, "client_assets"),
+    path: distDir,
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -70,13 +69,13 @@ module.exports = {
       patterns: [
         {
           from: path.join(__dirname, "assets"),
-          to: path.join(distDir, "client_assets"),
+          to: distDir,
         },
       ],
     }),
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'development',
-      CLIENT_CANISTER_ID: canisters["client"]
+      CLIENT_RS_CANISTER_ID: 'wat'
     }),
     new webpack.ProvidePlugin({
       Buffer: [require.resolve("buffer/"), "Buffer"],

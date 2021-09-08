@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "src/client_rs",
+    "src/hashtree",
+    "src/certified_map",
+]
