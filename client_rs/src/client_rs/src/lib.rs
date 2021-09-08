@@ -1,5 +1,6 @@
 use certified_map::{AsHashTree, RbTree};
 use hashtree::Hash;
+use ic_cdk::api::call::call_with_payment;
 use ic_cdk::api::call::CallResult;
 use ic_cdk::api::{data_certificate, set_certified_data};
 use ic_cdk::export::candid::Func;
@@ -13,8 +14,8 @@ use serde::Serialize;
 use serde_bytes::{ByteBuf, Bytes};
 use std::borrow::Cow;
 use std::cell::RefCell;
-use std::collections::BTreeMap;
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
+use std::convert::TryFrom;
 
 mod assets;
 
@@ -22,7 +23,7 @@ const LABEL_ASSETS: &[u8] = b"http_assets";
 
 thread_local! {
     static STATE: State = State {
-        daily_budget: RefCell::new(Cycles(1_000_000_000_000)),
+        daily_budget: RefCell::new(Cycles(100)),
         receivers: RefCell::new(vec![]),
         asset_hashes: RefCell::new(AssetHashes::default()),
     };
@@ -58,7 +59,6 @@ struct PendingDonation {
     // the number of button clicks for this receiver
     count: u32,
 }
-
 
 type HeaderField = (String, String);
 
@@ -111,6 +111,67 @@ async fn donate(receiver: DonationReceiver) {
     });
 }
 
+// Pay out the pending donations. This will distribute the DonationAmount of
+// cycles set using `set_donation_amount` according to `PendingDonations`.
+// The amount of paid out cylces are weighted according to the counts in
+// `PendingDonation`.
+//
+// TODO: maybe return an error if the client canister does not have enough
+// cycles?
+//
+// Authentication: the call must be made using a the self-authenticating
+// principal that was used for `register`.
+//
+// Traps if the caller is not the registered one, also if it is anonymous.
+#[update]
+async fn approve_donations() {
+    ////////////////////////////////
+    // TODO: add authentication!!!
+    ///////////////////////////////
+
+    let (count_receivers, total_num_clicks, total_amount_to_spend) = STATE.with(|state| {
+        let count_receivers = calculate_receiver_counts(&state.receivers.borrow());
+        let total_num_clicks = state.receivers.borrow().len();
+        let total_amount_to_spend = state.daily_budget.borrow();
+        (
+            count_receivers.clone(),
+            total_num_clicks,
+            total_amount_to_spend.clone(),
+        )
+    });
+
+    let canister_balance: u64 = ic_cdk::api::canister_balance();
+    let total_amount_to_spend_u64 = u64::try_from(total_amount_to_spend.0).unwrap_or_else(|_| {
+        ic_cdk::trap("Converting total amount to spend to u64 failed.");
+    });
+    if canister_balance < total_amount_to_spend_u64 {
+        ic_cdk::trap(&format!(
+            "Current canister balance ({}) not sufficient to pay out the total amount ({:?})",
+            canister_balance, total_amount_to_spend_u64
+        ))
+    }
+
+    for (receiver, count) in count_receivers {
+        let amount_to_send_to_receiver_u64 =
+            (total_amount_to_spend_u64 / total_num_clicks as u64) * count as u64;
+
+        let result: CallResult<()> = call_with_payment(
+            receiver,
+            "accept_cycles",
+            (receiver,),
+            amount_to_send_to_receiver_u64,
+        )
+        .await;
+        match result {
+            Err(e) => ic_cdk::print(&format!(
+                "Call to client {:?} to accept_cycles failed: {:?}",
+                receiver, e
+            )),
+            Ok(_) => {}
+        }
+    }
+}
+
 fn balance() -> Cycles {
     Cycles(ic_cdk::api::canister_balance() as u128)
 }
@@ -118,16 +179,9 @@ fn balance() -> Cycles {
 #[query]
 async fn list_donations() -> PendingDonations {
     STATE.with(|state| {
-        let receivers = state.receivers.borrow();
-        let mut countReceivers: HashMap<Principal, u32> = HashMap::new();
+        let count_receivers = calculate_receiver_counts(&state.receivers.borrow());
 
-        for receiver in receivers.iter() {
-            let principal = receiver.receiver;
-            let mut count = countReceivers.entry(principal).or_insert(0);
-            *count += 1;
-        }
-
-        let pending = countReceivers
+        let pending = count_receivers
             .iter()
             .map(|(r, c)| PendingDonation {
                 receiver: *r,
@@ -141,6 +195,19 @@ async fn list_donations() -> PendingDonations {
             balance: balance(),
         }
     })
+}
+
+fn calculate_receiver_counts(receivers: &Vec<DonationReceiver>) -> BTreeMap<Principal, u32> {
+    let mut count_receivers: BTreeMap<Principal, u32> = BTreeMap::new();
+
+    for receiver in receivers.iter() {
+        let principal = receiver.receiver;
+        count_receivers
+            .entry(principal)
+            .and_modify(|e| *e += 1)
+            .or_insert(1);
+    }
+    count_receivers
 }
 
 #[update]
