@@ -35,6 +35,10 @@ type PendingDonations =
   }
 
 foreign import listDonationsImpl :: EffectFnAff PendingDonations
+foreign import approveDonationsImpl :: EffectFnAff Unit
 
 listDonations :: Aff PendingDonations
 listDonations = fromEffectFnAff listDonationsImpl
+
+approveDonations :: Aff Unit
+approveDonations = fromEffectFnAff approveDonationsImpl

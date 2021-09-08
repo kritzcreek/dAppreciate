@@ -10,6 +10,7 @@ import Halogen (liftAff)
 import Halogen as H
 import Halogen.Aff as HA
 import Halogen.HTML as HH
+import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
 import Halogen.VDom.Driver (runUI)
 
@@ -22,7 +23,7 @@ type State =
   { pending :: Maybe API.PendingDonations
   }
 
-data Action = Initialize
+data Action = Initialize | ApproveDonations
 
 renderHeader :: forall act slots. State -> HH.HTML act slots
 renderHeader { pending } = HH.header_
@@ -53,12 +54,9 @@ renderMain state = HH.main_
       ]
   ]
 
-renderFooter :: forall act slots. State -> HH.HTML act slots
+renderFooter :: forall slots. State -> HH.HTML slots Action
 renderFooter _ = HH.footer_
-  [ HH.button [ HP.id "menuToday" ] [ HH.text "Today" ]
-  , HH.button [ HP.id "menuHistory" ] [ HH.text "History" ]
-  , HH.button [ HP.id "menuSettings" ] [ HH.text "Settings" ]
-  ]
+  [ HH.button [ HP.id "menuApprove", HE.onClick \_ -> ApproveDonations ] [ HH.text "Approve Donations" ] ]
 
 renderDAppr :: forall act slots. API.PendingDonation -> HH.HTML act slots
 renderDAppr pending = HH.div
@@ -85,3 +83,5 @@ component =
     Initialize -> void $ H.fork do
       pending <- liftAff API.listDonations
       H.put { pending: Just pending }
+    ApproveDonations -> do
+      liftAff API.approveDonations

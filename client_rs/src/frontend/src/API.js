@@ -30,3 +30,13 @@ exports.listDonationsImpl = (onError, onSuccess) => {
 
     return (cancelError, onCancelerError, onCancelerSuccess) => onCancelerSuccess();
 };
+
+exports.approveDonationsImpl = (onError, onSuccess) => {
+    client.approve_donations()
+        .then(_ => {
+            onSuccess()
+        })
+        .catch(onError);
+
+    return (cancelError, onCancelerError, onCancelerSuccess) => onCancelerSuccess();
+};
