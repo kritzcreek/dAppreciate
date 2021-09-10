@@ -14,10 +14,13 @@ newtype Cycles = Cycles BigInt
 foreign import toFixed :: Int -> Number -> String
 foreign import trillion :: BigInt
 
+billion :: BigInt
+billion = BigInt.fromInt 1000000000
+
 instance Show Cycles where
   show (Cycles c) = do
-    let tc = BigInt.div c trillion
-    toFixed 2 (BigInt.toNumber tc) <> "TC"
+    let billionCycles = BigInt.div c billion
+    toFixed 2 (BigInt.toNumber billionCycles / 1000.0) <> "TC"
 
 type DonationReceiver =
   { receiver :: Principal
