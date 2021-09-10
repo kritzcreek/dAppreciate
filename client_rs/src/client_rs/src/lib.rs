@@ -196,7 +196,7 @@ async fn list_donations() -> PendingDonations {
 
         PendingDonations {
             pending,
-            amount: Cycles(0),
+            amount: state.daily_budget.borrow().clone(),
             balance: balance(),
         }
     })
