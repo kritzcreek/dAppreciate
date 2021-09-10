@@ -12,7 +12,6 @@ type Principal = String
 newtype Cycles = Cycles BigInt
 
 foreign import toFixed :: Int -> Number -> String
-foreign import trillion :: BigInt
 
 billion :: BigInt
 billion = BigInt.fromInt 1000000000
